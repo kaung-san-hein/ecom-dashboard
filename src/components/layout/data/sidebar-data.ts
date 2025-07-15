@@ -1,7 +1,8 @@
 import {
   IconLayoutDashboard,
+  IconUsers,
 } from '@tabler/icons-react'
-import { Command, Layers } from 'lucide-react'
+import { Command, Layers, Tag, Package, ShoppingCart } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -26,6 +27,11 @@ export const sidebarData: SidebarData = {
           url: '/',
           icon: IconLayoutDashboard,
         },
+        {
+          title: 'Users',
+          url: '/users',
+          icon: IconUsers,
+        },
         // {
         //   title: 'Tasks',
         //   url: '/tasks',
@@ -42,15 +48,25 @@ export const sidebarData: SidebarData = {
         //   badge: '3',
         //   icon: IconMessages,
         // },
-        // {
-        //   title: 'Users',
-        //   url: '/users',
-        //   icon: IconUsers,
-        // },
         {
           title: 'Categories',
           url: '/categories',
           icon: Layers,
+        },
+        {
+          title: 'Brands',
+          url: '/brands',
+          icon: Tag,
+        },
+        {
+          title: 'Products',
+          url: '/products',
+          icon: Package,
+        },
+        {
+          title: 'Orders',
+          url: '/orders',
+          icon: ShoppingCart,
         },
       ],
     },

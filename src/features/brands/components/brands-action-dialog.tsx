@@ -1,5 +1,3 @@
-'use client'
-
 import { z } from 'zod'
 import axios from 'axios'
 import { useForm } from 'react-hook-form'
@@ -24,46 +22,44 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { User } from '../data/schema'
+import { Brand } from '../data/schema'
+import { BrandType } from '../data/type'
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required.' }),
-  email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Email is invalid.' }),
+  name: z.string().min(1, { message: 'Brand Name is required.' }),
 })
-type UserForm = z.infer<typeof formSchema>
+type BrandForm = z.infer<typeof formSchema>
 
 interface Props {
-  currentRow?: User
+  currentRow?: Brand
   open: boolean
   onOpenChange: (open: boolean) => void
-  setUsers: (value: React.SetStateAction<User[]>) => void
+  setBrands: (value: React.SetStateAction<BrandType[]>) => void
 }
 
-export function UsersActionDialog({
+export function BrandsActionDialog({
   currentRow,
   open,
   onOpenChange,
-  setUsers,
+  setBrands,
 }: Props) {
   const isEdit = !!currentRow
-  const form = useForm<UserForm>({
+  const form = useForm<BrandForm>({
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
       ? {
-          name: currentRow.name,
-          email: currentRow.email,
+          ...currentRow,
         }
       : {
           name: '',
-          email: '',
         },
   })
 
-  const onSubmit = async (values: UserForm) => {
+  const onSubmit = async (values: BrandForm) => {
     try {
       if (currentRow) {
-        const result = await call('patch', `users/${currentRow.id}`, values)
-        setUsers((prev) =>
+        const result = await call('patch', `brands/${currentRow.id}`, values)
+        setBrands((prev) =>
           prev.map((item) =>
             item.id === result.id ? { ...item, ...result } : item
           )
@@ -75,8 +71,8 @@ export function UsersActionDialog({
           title: 'Successfully Updated',
         })
       } else {
-        const result = await call('post', 'users', values)
-        setUsers((prev) => [...prev, result])
+        const result = await call('post', 'brands', values)
+        setBrands((prev) => [...prev, result])
 
         form.reset()
         toast({
@@ -112,16 +108,16 @@ export function UsersActionDialog({
       <DialogContent className='sm:max-w-lg p-4 min-h-fit h-auto'>
         <DialogHeader className='text-left'>
           <DialogTitle>
-            {isEdit ? 'Edit User' : 'Add New User'}
+            {isEdit ? 'Edit Brand' : 'Add New Brand'}
           </DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Update user here. ' : 'Create new user here. '}{' '}
+            {isEdit ? 'Update brand here. ' : 'Create new brand here. '}{' '}
             Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
-            id='user-form'
+            id='brand-form'
             onSubmit={form.handleSubmit(onSubmit)}
             className='space-y-4 p-0.5'
           >
@@ -133,26 +129,9 @@ export function UsersActionDialog({
                   <FormLabel className='col-span-2 text-right'>Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='John Doe'
+                      placeholder='Nike'
                       className='col-span-4'
                       autoComplete='off'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className='col-span-4 col-start-3' />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
-                  <FormLabel className='col-span-2 text-right'>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='john.doe@gmail.com'
-                      className='col-span-4'
                       {...field}
                     />
                   </FormControl>
@@ -163,11 +142,11 @@ export function UsersActionDialog({
           </form>
         </Form>
         <DialogFooter>
-          <Button type='submit' form='user-form'>
+          <Button type='submit' form='brand-form'>
             Save
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
-}
+} 

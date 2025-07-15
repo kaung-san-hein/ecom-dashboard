@@ -1,11 +1,8 @@
-import { useState } from 'react'
 import {
   ColumnDef,
   RowData,
-  SortingState,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import {
@@ -16,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { User } from '../data/schema'
+import { Order } from '../data/schema'
 
 declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -26,22 +23,15 @@ declare module '@tanstack/react-table' {
 }
 
 interface DataTableProps {
-  columns: ColumnDef<User>[]
-  data: User[]
+  columns: ColumnDef<Order>[]
+  data: Order[]
 }
 
-export function UsersTable({ columns, data }: DataTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([])
-
+export function OrdersTable({ columns, data }: DataTableProps) {
   const table = useReactTable({
     data,
     columns,
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   })
 
   return (
@@ -88,7 +78,7 @@ export function UsersTable({ columns, data }: DataTableProps) {
                 colSpan={columns.length}
                 className='h-24 text-center'
               >
-                No results.
+                No orders found.
               </TableCell>
             </TableRow>
           )}
@@ -96,4 +86,4 @@ export function UsersTable({ columns, data }: DataTableProps) {
       </Table>
     </div>
   )
-}
+} 

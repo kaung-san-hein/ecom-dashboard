@@ -67,7 +67,7 @@ export function Overview() {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value) => `${value.toLocaleString()} MMK`}
         />
         <Bar
           dataKey='total'
