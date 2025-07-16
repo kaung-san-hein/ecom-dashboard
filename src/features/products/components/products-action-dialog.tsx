@@ -144,7 +144,7 @@ export function ProductsActionDialog({
         brand_id: currentRow.brand?.id || undefined,
       })
     }
-  }, [open, isEdit, currentRow, form])
+  }, [open, isEdit, currentRow])
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
