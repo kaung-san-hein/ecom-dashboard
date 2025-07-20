@@ -12,6 +12,23 @@ export const columns: ColumnDef<Category>[] = [
     header: 'Category Name',
   },
   {
+    accessorKey: 'image',
+    header: 'Image',
+    cell: ({ getValue }) => {
+      const imageUrl = getValue<string | null>()
+      if (!imageUrl) {
+        return <span className="text-muted-foreground">No image</span>
+      }
+      return (
+        <img
+          src={imageUrl}
+          alt="Category"
+          className="w-13 h-12 object-cover rounded border"
+        />
+      )
+    },
+  },
+  {
     accessorKey: 'createdAt',
     header: 'Created At',
     cell: ({ getValue }) => {
