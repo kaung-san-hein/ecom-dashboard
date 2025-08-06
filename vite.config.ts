@@ -6,6 +6,10 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), TanStackRouterVite()],
+  base: '/ecom-dashboard/',
+  server: {
+    port: 8080,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
