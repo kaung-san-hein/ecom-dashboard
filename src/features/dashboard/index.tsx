@@ -9,13 +9,30 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { getDashboardStats } from './services'
-import { DashboardStats } from './types'
+import { getDashboardStats, getOrdersReport } from './services'
+import { DashboardStats, OrdersReport } from './types'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts'
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [ordersReport, setOrdersReport] = useState<OrdersReport | null>(null)
   const [loading, setLoading] = useState(true)
+  const [ordersLoading, setOrdersLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -32,7 +49,20 @@ export default function Dashboard() {
       }
     }
 
+    const fetchOrdersReport = async () => {
+      try {
+        setOrdersLoading(true)
+        const data = await getOrdersReport()
+        setOrdersReport(data)
+      } catch (err) {
+        console.error('Error fetching orders report:', err)
+      } finally {
+        setOrdersLoading(false)
+      }
+    }
+
     fetchStats()
+    fetchOrdersReport()
   }, [])
 
   const StatCard = ({ 
@@ -115,7 +145,161 @@ export default function Dashboard() {
         </div>
 
         <div className='space-y-6'>
-          {/* First Row - Users, Categories, Brands */}
+          {/* First Row - Orders Charts */}
+          {ordersLoading ? (
+            <div className="space-y-6">
+              <div className='grid gap-4 md:grid-cols-3'>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <LoadingCard key={index} />
+                ))}
+              </div>
+              <Card>
+                <CardHeader>
+                  <Skeleton className='h-6 w-48' />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className='h-80 w-full' />
+                </CardContent>
+              </Card>
+            </div>
+          ) : ordersReport ? (
+            <div className="space-y-6">
+              {/* Orders Metrics */}
+              <div className='grid gap-4 md:grid-cols-3'>
+                <StatCard
+                  title="Total Orders"
+                  value={(ordersReport.totalOrders || 0).toLocaleString()}
+                  icon={
+                    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2'>
+                      <path d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z' />
+                      <path d='M3 6h18' />
+                      <path d='M16 10a4 4 0 0 1-8 0' />
+                    </svg>
+                  }
+                  className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20"
+                />
+                <StatCard
+                  title="Total Revenue"
+                  value={`$${(ordersReport.totalRevenue || 0).toLocaleString()}`}
+                  icon={
+                    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2'>
+                      <line x1='12' x2='12.01' y1='2' y2='2' />
+                      <path d='M14.31 8c1.77-2.45 4.12-4 6.69-4 1.77 0 3.25.8 4.25 2' />
+                      <path d='M9.69 8h11.62' />
+                      <path d='M7.38 12l-3.03 3.03a3 3 0 0 0 0 4.24l1.41 1.41a3 3 0 0 0 4.24 0L15.62 12' />
+                      <path d='M9.69 16H3.06' />
+                      <path d='M13.31 16l3.03 3.03a3 3 0 0 0 4.24 0l1.41-1.41a3 3 0 0 0 0-4.24L16.38 16' />
+                    </svg>
+                  }
+                  className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20"
+                />
+                <StatCard
+                  title="Average Order"
+                  value={`$${(ordersReport.averageOrderValue || 0).toFixed(2)}`}
+                  icon={
+                    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2'>
+                      <polyline points='22,12 18,12 15,21 9,3 6,12 2,12' />
+                    </svg>
+                  }
+                  className="border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-950/20"
+                />
+              </div>
+
+              {/* Monthly Orders Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Monthly Orders Trend</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                                         <LineChart data={Array.from({ length: 12 }, (_, i) => {
+                       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                       return {
+                         month: monthNames[i],
+                         2023: (ordersReport.monthlyOrders?.[2023]?.[i]) || 0,
+                         2024: (ordersReport.monthlyOrders?.[2024]?.[i]) || 0,
+                         2025: (ordersReport.monthlyOrders?.[2025]?.[i]) || 0,
+                       }
+                     })}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="2023" stroke="#3b82f6" strokeWidth={2} />
+                      <Line type="monotone" dataKey="2024" stroke="#10b981" strokeWidth={2} />
+                      <Line type="monotone" dataKey="2025" stroke="#f59e0b" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Charts Row */}
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* Order Status Distribution */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Order Status Distribution</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={Object.entries(ordersReport.orderStatusDistribution || {}).map(([status, count]) => ({
+                            name: status.charAt(0).toUpperCase() + status.slice(1),
+                            value: count,
+                          }))}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {Object.entries(ordersReport.orderStatusDistribution || {}).map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444'][index % 5]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                {/* Monthly Revenue by Year */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Monthly Revenue by Year</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={Array.from({ length: 12 }, (_, i) => {
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                        return {
+                          month: monthNames[i],
+                          2023: (ordersReport.monthlyRevenue?.[2023]?.[i]) || 0,
+                          2024: (ordersReport.monthlyRevenue?.[2024]?.[i]) || 0,
+                          2025: (ordersReport.monthlyRevenue?.[2025]?.[i]) || 0,
+                        }
+                      })}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']} />
+                        <Legend />
+                        <Bar dataKey="2023" fill="#3b82f6" />
+                        <Bar dataKey="2024" fill="#10b981" />
+                        <Bar dataKey="2025" fill="#f59e0b" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          ) : null}
+
+          {/* Second Row - General Stats */}
           <div className='grid gap-4 md:grid-cols-3'>
             {loading ? (
               Array.from({ length: 3 }).map((_, index) => (
@@ -164,7 +348,7 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Second Row - Products (Active/Inactive) */}
+          {/* Third Row - Products (Active/Inactive) */}
           <div className='grid gap-4 md:grid-cols-2'>
             {loading ? (
               Array.from({ length: 2 }).map((_, index) => (
@@ -200,7 +384,7 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Third Row - Orders (Different colors for each status) */}
+          {/* Fourth Row - Orders (Different colors for each status) */}
           <div className='grid gap-4 md:grid-cols-5'>
             {loading ? (
               Array.from({ length: 5 }).map((_, index) => (
