@@ -180,7 +180,7 @@ export default function Dashboard() {
                 />
                 <StatCard
                   title="Total Revenue"
-                  value={`$${(ordersReport.totalRevenue || 0).toLocaleString()}`}
+                  value={`${(ordersReport.totalRevenue || 0).toLocaleString()} MMK`}
                   icon={
                     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2'>
                       <line x1='12' x2='12.01' y1='2' y2='2' />
@@ -195,7 +195,7 @@ export default function Dashboard() {
                 />
                 <StatCard
                   title="Average Order"
-                  value={`$${(ordersReport.averageOrderValue || 0).toFixed(2)}`}
+                  value={`${Math.floor(ordersReport.averageOrderValue || 0).toLocaleString()} MMK`}
                   icon={
                     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2'>
                       <polyline points='22,12 18,12 15,21 9,3 6,12 2,12' />
