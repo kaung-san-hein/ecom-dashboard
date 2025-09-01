@@ -57,7 +57,7 @@ export function OrderDetailDialog({ order, open, onOpenChange, onStatusUpdate }:
 
   const statusColors = {
     pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    processing: 'bg-blue-100 text-blue-800 border-blue-200',
+    confirmed: 'bg-blue-100 text-blue-800 border-blue-200',
     shipped: 'bg-purple-100 text-purple-800 border-purple-200',
     delivered: 'bg-green-100 text-green-800 border-green-200',
     cancelled: 'bg-red-100 text-red-800 border-red-200',
@@ -175,7 +175,7 @@ export function OrderDetailDialog({ order, open, onOpenChange, onStatusUpdate }:
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
                     <SelectItem value="shipped">Shipped</SelectItem>
                     <SelectItem value="delivered">Delivered</SelectItem>
                     <SelectItem value="cancelled">Cancelled</SelectItem>

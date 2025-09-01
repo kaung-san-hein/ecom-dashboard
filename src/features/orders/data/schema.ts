@@ -43,7 +43,7 @@ const orderSchema = z.object({
   total: z.string(),
   phone: z.string(),
   address: z.string(),
-  status: z.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
+  status: z.enum(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']),
   user_id: z.number(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
