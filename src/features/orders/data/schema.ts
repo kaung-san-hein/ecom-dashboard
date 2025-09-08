@@ -5,7 +5,8 @@ const productSchema = z.object({
   name: z.string(),
   description: z.string(),
   price: z.string(),
-  discountPrice: z.string().nullable(),
+  salePrice: z.string().nullable().optional(),
+  discountPercentage: z.string().nullable().optional(),
   stock: z.number(),
   images: z.array(z.string()),
   isActive: z.boolean(),
@@ -39,7 +40,7 @@ const userSchema = z.object({
 const orderSchema = z.object({
   id: z.number(),
   date: z.string(),
-  payment_image: z.string(),
+  payment_image: z.string().nullable().optional(),
   total: z.string(),
   phone: z.string(),
   address: z.string(),

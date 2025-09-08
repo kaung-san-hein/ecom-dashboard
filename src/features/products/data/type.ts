@@ -17,7 +17,8 @@ export type ProductType = {
   name: string
   description?: string
   price: number
-  discountPrice?: number
+  salePrice?: number
+  discountPercentage?: number
   stock?: number
   isActive?: boolean
   isFeatured?: boolean

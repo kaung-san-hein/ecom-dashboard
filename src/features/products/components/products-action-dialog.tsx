@@ -109,7 +109,7 @@ export function ProductsActionDialog({
           name: currentRow.name,
           description: currentRow.description || '',
           price: currentRow.price,
-          discountPrice: currentRow.discountPrice || undefined,
+          discountPercentage: currentRow.discountPercentage || undefined,
           stock: currentRow.stock || undefined,
           isActive: currentRow.isActive || false,
           isFeatured: currentRow.isFeatured || false,
@@ -120,7 +120,7 @@ export function ProductsActionDialog({
           name: '',
           description: '',
           price: 0,
-          discountPrice: undefined,
+          discountPercentage: undefined,
           stock: undefined,
           isActive: true,
           isFeatured: false,
@@ -136,7 +136,7 @@ export function ProductsActionDialog({
         name: currentRow.name,
         description: currentRow.description || '',
         price: currentRow.price,
-        discountPrice: currentRow.discountPrice || undefined,
+        discountPercentage: currentRow.discountPercentage || undefined,
         stock: currentRow.stock || undefined,
         isActive: currentRow.isActive ?? false,
         isFeatured: currentRow.isFeatured ?? false,
@@ -358,17 +358,25 @@ export function ProductsActionDialog({
             <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name='discountPrice'
+                name='discountPercentage'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Discount Price (MMK)</FormLabel>
+                    <FormLabel>Discount Percentage (%)</FormLabel>
                     <FormControl>
                       <Input
                         type='number'
                         step='1'
                         placeholder='0'
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === '') {
+                            field.onChange(undefined)
+                          } else {
+                            const numValue = parseFloat(value)
+                            field.onChange(isNaN(numValue) ? undefined : numValue)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -387,7 +395,15 @@ export function ProductsActionDialog({
                         type='number'
                         placeholder='0'
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value === '') {
+                            field.onChange(undefined)
+                          } else {
+                            const numValue = parseInt(value)
+                            field.onChange(isNaN(numValue) ? undefined : numValue)
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />

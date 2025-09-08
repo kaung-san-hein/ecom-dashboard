@@ -2,7 +2,6 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Product } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -22,11 +21,19 @@ export const columns: ColumnDef<Product>[] = [
     },
   },
   {
-    accessorKey: 'discountPrice',
-    header: 'Discount Price',
+    accessorKey: 'salePrice',
+    header: 'Sale Price',
     cell: ({ getValue }) => {
-      const price = getValue<number>()
-      return price ? `${Math.round(price).toLocaleString()} MMK` : '-'
+      const salePrice = getValue<number>()
+      return salePrice ? `${Math.round(salePrice).toLocaleString()} MMK` : '-'
+    },
+  },
+  {
+    accessorKey: 'discountPercentage',
+    header: 'Discount %',
+    cell: ({ getValue }) => {
+      const percentage = getValue<number>()
+      return percentage ? `${Math.round(percentage)}%` : '-'
     },
   },
   {

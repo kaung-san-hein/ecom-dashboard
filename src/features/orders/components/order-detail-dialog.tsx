@@ -20,7 +20,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Order } from '../data/schema'
-import { Package, User, Phone, MapPin, CreditCard, Calendar } from 'lucide-react'
+import { Package, User, CreditCard, Calendar } from 'lucide-react'
 
 interface Props {
   order: Order | null
@@ -153,11 +153,17 @@ export function OrderDetailDialog({ order, open, onOpenChange, onStatusUpdate }:
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Payment Proof</p>
-                <img 
-                  src={order.payment_image} 
-                  alt="Payment proof" 
-                  className="w-32 h-20 object-cover rounded border"
-                />
+                {order.payment_image ? (
+                  <img 
+                    src={order.payment_image} 
+                    alt="Payment proof" 
+                    className="w-32 h-20 object-cover rounded border"
+                  />
+                ) : (
+                  <div className="w-32 h-20 border-2 border-dashed border-gray-300 rounded flex items-center justify-center">
+                    <p className="text-sm text-gray-500">No payment proof</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

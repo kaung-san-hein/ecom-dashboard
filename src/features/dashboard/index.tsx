@@ -286,7 +286,7 @@ export default function Dashboard() {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
                         <YAxis />
-                        <Tooltip formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']} />
+                        <Tooltip formatter={(value: number) => [`${value.toLocaleString()} MMK`, 'Revenue']} />
                         <Legend />
                         <Bar dataKey="2023" fill="#3b82f6" />
                         <Bar dataKey="2024" fill="#10b981" />
