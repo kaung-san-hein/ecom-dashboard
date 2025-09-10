@@ -235,7 +235,7 @@ export default function Dashboard() {
               </Card>
 
               {/* Charts Row */}
-              <div className="grid gap-6 md:grid-cols-2">
+              {/* <div className="grid gap-6 md:grid-cols-2"> */}
                 {/* Order Status Distribution */}
                 <Card>
                   <CardHeader>
@@ -257,7 +257,7 @@ export default function Dashboard() {
                           fill="#8884d8"
                           dataKey="value"
                         >
-                          {Object.entries(ordersReport.orderStatusDistribution || {}).map((entry, index) => (
+                          {Object.entries(ordersReport.orderStatusDistribution || {}).map((_, index) => (
                             <Cell key={`cell-${index}`} fill={['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444'][index % 5]} />
                           ))}
                         </Pie>
@@ -274,19 +274,35 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={Array.from({ length: 12 }, (_, i) => {
-                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                        return {
-                          month: monthNames[i],
-                          2023: (ordersReport.monthlyRevenue?.[2023]?.[i]) || 0,
-                          2024: (ordersReport.monthlyRevenue?.[2024]?.[i]) || 0,
-                          2025: (ordersReport.monthlyRevenue?.[2025]?.[i]) || 0,
-                        }
-                      })}>
+                      <BarChart 
+                        data={Array.from({ length: 12 }, (_, i) => {
+                          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                          return {
+                            month: monthNames[i],
+                            2023: (ordersReport.monthlyRevenue?.[2023]?.[i]) || 0,
+                            2024: (ordersReport.monthlyRevenue?.[2024]?.[i]) || 0,
+                            2025: (ordersReport.monthlyRevenue?.[2025]?.[i]) || 0,
+                          }
+                        })}
+                        margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
+                      >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip formatter={(value: number) => [`${value.toLocaleString()} MMK`, 'Revenue']} />
+                        <YAxis 
+                          tickFormatter={(value) => {
+                            if (value >= 1000000) {
+                              return `${(value / 1000000).toFixed(1)}M`
+                            } else if (value >= 1000) {
+                              return `${(value / 1000).toFixed(1)}K`
+                            }
+                            return value.toLocaleString()
+                          }}
+                          width={80}
+                        />
+                        <Tooltip 
+                          formatter={(value: number) => [`${value.toLocaleString()} MMK`, 'Revenue']}
+                          labelFormatter={(label) => `Month: ${label}`}
+                        />
                         <Legend />
                         <Bar dataKey="2023" fill="#3b82f6" />
                         <Bar dataKey="2024" fill="#10b981" />
@@ -295,7 +311,7 @@ export default function Dashboard() {
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
-              </div>
+              {/* </div> */}
             </div>
           ) : null}
 
