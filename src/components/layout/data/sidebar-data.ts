@@ -2,7 +2,7 @@ import {
   IconLayoutDashboard,
   IconUsers,
 } from '@tabler/icons-react'
-import { Command, Layers, Tag, Package, ShoppingCart } from 'lucide-react'
+import { Command, Layers, Tag, Package, ShoppingCart, DollarSign } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -67,6 +67,11 @@ export const sidebarData: SidebarData = {
           title: 'Orders',
           url: '/orders',
           icon: ShoppingCart,
+        },
+        {
+          title: 'Sales',
+          url: '/sales',
+          icon: DollarSign,
         },
       ],
     },

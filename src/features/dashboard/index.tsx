@@ -9,8 +9,8 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { getDashboardStats, getOrdersReport } from './services'
-import { DashboardStats, OrdersReport } from './types'
+import { getDashboardStats, getOrdersReport, getYearlyReport } from './services'
+import { DashboardStats, OrdersReport, YearlyReport } from './types'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   LineChart,
@@ -31,8 +31,10 @@ import {
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [ordersReport, setOrdersReport] = useState<OrdersReport | null>(null)
+  const [yearlyReport, setYearlyReport] = useState<YearlyReport | null>(null)
   const [loading, setLoading] = useState(true)
   const [ordersLoading, setOrdersLoading] = useState(true)
+  const [yearlyLoading, setYearlyLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -61,8 +63,21 @@ export default function Dashboard() {
       }
     }
 
+    const fetchYearlyReport = async () => {
+      try {
+        setYearlyLoading(true)
+        const data = await getYearlyReport()
+        setYearlyReport(data)
+      } catch (err) {
+        console.error('Error fetching yearly report:', err)
+      } finally {
+        setYearlyLoading(false)
+      }
+    }
+
     fetchStats()
     fetchOrdersReport()
+    fetchYearlyReport()
   }, [])
 
   const StatCard = ({ 
@@ -205,6 +220,80 @@ export default function Dashboard() {
                 />
               </div>
 
+              {/* Yearly Orders Bar Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Yearly Orders Comparison</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {yearlyLoading ? (
+                    <Skeleton className='h-80 w-full' />
+                  ) : yearlyReport ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart
+                        data={Object.entries(yearlyReport).map(([year, data]) => ({
+                          year,
+                          orders: data.orders,
+                        }))}
+                        margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="year" />
+                        <YAxis 
+                          tickFormatter={(value: number) => Math.floor(value)}
+                        />
+                        <Tooltip 
+                          formatter={(value: number) => [`${Math.floor(value)}`, 'Orders']}
+                          labelFormatter={(label) => `Year: ${label}`}
+                        />
+                        <Bar dataKey="orders" fill="#3b82f6" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : null}
+                </CardContent>
+              </Card>
+
+              {/* Yearly Revenue Bar Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Yearly Revenue Comparison</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {yearlyLoading ? (
+                    <Skeleton className='h-80 w-full' />
+                  ) : yearlyReport ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart
+                        data={Object.entries(yearlyReport).map(([year, data]) => ({
+                          year,
+                          revenue: data.revenue,
+                        }))}
+                        margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="year" />
+                        <YAxis 
+                          tickFormatter={(value) => {
+                            if (value >= 1000000) {
+                              return `${(value / 1000000).toFixed(1)}M`
+                            } else if (value >= 1000) {
+                              return `${(value / 1000).toFixed(1)}K`
+                            }
+                            return value.toLocaleString()
+                          }}
+                          width={80}
+                        />
+                        <Tooltip 
+                          formatter={(value: number) => [`${value.toLocaleString()} MMK`, 'Revenue']}
+                          labelFormatter={(label) => `Year: ${label}`}
+                        />
+                        <Bar dataKey="revenue" fill="#10b981" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : null}
+                </CardContent>
+              </Card>
+
               {/* Monthly Orders Chart */}
               <Card>
                 <CardHeader>
@@ -260,6 +349,39 @@ export default function Dashboard() {
                           {Object.entries(ordersReport.orderStatusDistribution || {}).map((_, index) => (
                             <Cell key={`cell-${index}`} fill={['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444'][index % 5]} />
                           ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                {/* Confirmed vs Cancelled Distribution */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Confirmed vs Cancelled Distribution</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={Object.entries(ordersReport.confirmedCancelledDistribution || {}).map(([status, count]) => ({
+                            name: status.charAt(0).toUpperCase() + status.slice(1),
+                            value: count,
+                          }))}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {Object.entries(ordersReport.confirmedCancelledDistribution || {}).map(([status, _], index) => {
+                            // Use different colors for confirmed vs cancelled
+                            const color = status.toLowerCase().includes('confirmed') ? '#10b981' : '#ef4444'
+                            return <Cell key={`cell-${index}`} fill={color} />
+                          })}
                         </Pie>
                         <Tooltip />
                       </PieChart>
