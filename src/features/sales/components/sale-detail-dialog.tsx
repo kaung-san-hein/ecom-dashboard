@@ -207,48 +207,80 @@ export function SaleDetailDialog({ sale, open, onOpenChange }: Props) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {sale.orderItems.map((item, index) => (
-                  <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <span className="text-sm font-bold text-primary">#{index + 1}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-lg">{item.product.name}</h4>
-                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                            {item.product.description}
-                          </p>
-                          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                            <span>SKU: #{item.product.id}</span>
-                            <span>Stock: {item.product.stock}</span>
-                            <span className={`px-2 py-1 rounded-full text-xs ${
-                              item.product.isActive 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {item.product.isActive ? 'Active' : 'Inactive'}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="text-right ml-4">
-                          <div className="space-y-1">
-                            <p className="text-sm text-muted-foreground">
-                              {item.quantity} × {parseFloat(item.product.price).toLocaleString()} MMK
-                            </p>
-                            <p className="text-lg font-bold text-primary">
-                              {parseFloat(item.subtotal).toLocaleString()} MMK
-                            </p>
-                          </div>
+                {sale.orderItems.map((item, index) => {
+                  const originalPrice = parseFloat(item.product.price)
+                  const discountPercentage = item.product.discountPercentage ? parseFloat(item.product.discountPercentage) : 0
+                  const hasDiscount = discountPercentage > 0
+                  const discountedPrice = hasDiscount ? originalPrice * (1 - discountPercentage / 100) : originalPrice
+                  const itemSubtotal = item.quantity * discountedPrice
+                  
+                  return (
+                    <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <span className="text-sm font-bold text-primary">#{index + 1}</span>
                         </div>
                       </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-lg">{item.product.name}</h4>
+                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                              {item.product.description}
+                            </p>
+                            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                              <span>SKU: #{item.product.id}</span>
+                              <span>Stock: {item.product.stock}</span>
+                              <span className={`px-2 py-1 rounded-full text-xs ${
+                                item.product.isActive 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {item.product.isActive ? 'Active' : 'Inactive'}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="text-right ml-4">
+                            <div className="space-y-1">
+                              <div className="text-sm text-muted-foreground">
+                                <p>Quantity: {item.quantity}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  {hasDiscount ? (
+                                    <>
+                                      <span className="line-through text-gray-500">
+                                        {originalPrice.toLocaleString()} MMK
+                                      </span>
+                                      <span className="text-green-600 font-medium">
+                                        {discountedPrice.toLocaleString()} MMK
+                                      </span>
+                                      <span className="text-red-600 text-xs">
+                                        -{discountPercentage}%
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span>{originalPrice.toLocaleString()} MMK</span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-lg font-bold text-primary">
+                                  {itemSubtotal.toLocaleString()} MMK
+                                </p>
+                                {hasDiscount && (
+                                  <p className="text-xs text-muted-foreground">
+                                    (was {(item.quantity * originalPrice).toLocaleString()} MMK)
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
                 
                 <Separator className="my-4" />
                 

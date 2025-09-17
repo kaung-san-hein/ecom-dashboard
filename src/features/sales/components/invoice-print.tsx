@@ -93,29 +93,62 @@ export const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(({ sal
             </tr>
           </thead>
           <tbody>
-            {sale.orderItems.map((item, index) => (
-              <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                <td className="border border-gray-300 px-4 py-3 text-gray-700">{index + 1}</td>
-                <td className="border border-gray-300 px-4 py-3 text-gray-700">
-                  <div>
-                    <p className="font-medium">{item.product.name}</p>
-                    <p className="text-sm text-gray-500">{item.product.description}</p>
-                  </div>
-                </td>
-                <td className="border border-gray-300 px-4 py-3 text-center text-gray-700">
-                  #{item.product.id}
-                </td>
-                <td className="border border-gray-300 px-4 py-3 text-center text-gray-700">
-                  {item.quantity}
-                </td>
-                <td className="border border-gray-300 px-4 py-3 text-right text-gray-700">
-                  {parseFloat(item.product.price).toLocaleString()} MMK
-                </td>
-                <td className="border border-gray-300 px-4 py-3 text-right text-gray-700 font-medium">
-                  {parseFloat(item.subtotal).toLocaleString()} MMK
-                </td>
-              </tr>
-            ))}
+            {sale.orderItems.map((item, index) => {
+              const originalPrice = parseFloat(item.product.price)
+              const discountPercentage = item.product.discountPercentage ? parseFloat(item.product.discountPercentage) : 0
+              const hasDiscount = discountPercentage > 0
+              const discountedPrice = hasDiscount ? originalPrice * (1 - discountPercentage / 100) : originalPrice
+              const itemSubtotal = item.quantity * discountedPrice
+              
+              return (
+                <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <td className="border border-gray-300 px-4 py-3 text-gray-700">{index + 1}</td>
+                  <td className="border border-gray-300 px-4 py-3 text-gray-700">
+                    <div>
+                      <p className="font-medium">{item.product.name}</p>
+                      <p className="text-sm text-gray-500">{item.product.description}</p>
+                    </div>
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3 text-center text-gray-700">
+                    #{item.product.id}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3 text-center text-gray-700">
+                    {item.quantity}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3 text-right text-gray-700">
+                    <div className="space-y-1">
+                      {hasDiscount ? (
+                        <>
+                          <div className="text-sm">
+                            <span className="line-through text-gray-400">
+                              {originalPrice.toLocaleString()} MMK
+                            </span>
+                            <span className="ml-2 text-green-600 font-medium">
+                              {discountedPrice.toLocaleString()} MMK
+                            </span>
+                          </div>
+                          <div className="text-xs text-red-600">
+                            -{discountPercentage}% discount
+                          </div>
+                        </>
+                      ) : (
+                        <span>{originalPrice.toLocaleString()} MMK</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3 text-right text-gray-700 font-medium">
+                    <div className="space-y-1">
+                      <span>{itemSubtotal.toLocaleString()} MMK</span>
+                      {hasDiscount && (
+                        <div className="text-xs text-gray-500">
+                          (was {(item.quantity * originalPrice).toLocaleString()} MMK)
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

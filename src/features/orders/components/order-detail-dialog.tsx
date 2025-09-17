@@ -129,19 +129,49 @@ export function OrderDetailDialog({ order, open, onOpenChange, onStatusUpdate }:
               Order Items ({order.orderItems.length})
             </h3>
             <div className="space-y-3">
-              {order.orderItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 p-3 border rounded-lg">
-                  <div className="flex-1">
-                    <p className="font-medium">{item.product.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Quantity: {item.quantity} × {parseFloat(item.product.price).toLocaleString()} MMK
-                    </p>
+              {order.orderItems.map((item) => {
+                const originalPrice = parseFloat(item.product.price)
+                const discountPercentage = item.product.discountPercentage ? parseFloat(item.product.discountPercentage) : 0
+                const hasDiscount = discountPercentage > 0
+                const discountedPrice = hasDiscount ? originalPrice * (1 - discountPercentage / 100) : originalPrice
+                const itemSubtotal = item.quantity * discountedPrice
+                
+                return (
+                  <div key={item.id} className="flex items-center gap-4 p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <p className="font-medium">{item.product.name}</p>
+                      <div className="text-sm text-muted-foreground space-y-1">
+                        <p>Quantity: {item.quantity}</p>
+                        <div className="flex items-center gap-2">
+                          {hasDiscount ? (
+                            <>
+                              <span className="line-through text-gray-500">
+                                {originalPrice.toLocaleString()} MMK
+                              </span>
+                              <span className="text-green-600 font-medium">
+                                {discountedPrice.toLocaleString()} MMK
+                              </span>
+                              <span className="text-red-600 text-xs">
+                                -{discountPercentage}%
+                              </span>
+                            </>
+                          ) : (
+                            <span>{originalPrice.toLocaleString()} MMK</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">{itemSubtotal.toLocaleString()} MMK</p>
+                      {hasDiscount && (
+                        <p className="text-xs text-muted-foreground">
+                          (was {(item.quantity * originalPrice).toLocaleString()} MMK)
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">{parseFloat(item.subtotal).toLocaleString()} MMK</p>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 

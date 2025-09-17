@@ -295,19 +295,50 @@ export const printInvoice = (sale: Sale) => {
             </tr>
           </thead>
           <tbody>
-            ${sale.orderItems.map((item, index) => `
-              <tr>
-                <td>${index + 1}</td>
-                <td>
-                  <div class="item-name">${item.product.name}</div>
-                  <div class="item-description">${item.product.description}</div>
-                </td>
-                <td class="text-center">#${item.product.id}</td>
-                <td class="text-center">${item.quantity}</td>
-                <td class="text-right">${parseFloat(item.product.price).toLocaleString()} MMK</td>
-                <td class="text-right"><strong>${parseFloat(item.subtotal).toLocaleString()} MMK</strong></td>
-              </tr>
-            `).join('')}
+            ${sale.orderItems.map((item, index) => {
+              const originalPrice = parseFloat(item.product.price)
+              const discountPercentage = item.product.discountPercentage ? parseFloat(item.product.discountPercentage) : 0
+              const hasDiscount = discountPercentage > 0
+              const discountedPrice = hasDiscount ? originalPrice * (1 - discountPercentage / 100) : originalPrice
+              const itemSubtotal = item.quantity * discountedPrice
+              
+              return `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>
+                    <div class="item-name">${item.product.name}</div>
+                    <div class="item-description">${item.product.description}</div>
+                  </td>
+                  <td class="text-center">#${item.product.id}</td>
+                  <td class="text-center">${item.quantity}</td>
+                  <td class="text-right">
+                    ${hasDiscount ? `
+                      <div style="font-size: 0.9rem;">
+                        <div style="text-decoration: line-through; color: #999; margin-bottom: 2px;">
+                          ${originalPrice.toLocaleString()} MMK
+                        </div>
+                        <div style="color: #16a34a; font-weight: 500;">
+                          ${discountedPrice.toLocaleString()} MMK
+                        </div>
+                        <div style="color: #dc2626; font-size: 0.8rem;">
+                          -${discountPercentage}% discount
+                        </div>
+                      </div>
+                    ` : `${originalPrice.toLocaleString()} MMK`}
+                  </td>
+                  <td class="text-right">
+                    <div>
+                      <strong>${itemSubtotal.toLocaleString()} MMK</strong>
+                      ${hasDiscount ? `
+                        <div style="font-size: 0.8rem; color: #666; margin-top: 2px;">
+                          (was ${(item.quantity * originalPrice).toLocaleString()} MMK)
+                        </div>
+                      ` : ''}
+                    </div>
+                  </td>
+                </tr>
+              `
+            }).join('')}
           </tbody>
         </table>
 
