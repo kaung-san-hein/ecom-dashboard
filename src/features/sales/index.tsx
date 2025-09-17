@@ -6,6 +6,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { columns } from './components/sales-columns'
 import { SalesTable } from './components/sales-table'
 import { SaleDetailDialog } from './components/sale-detail-dialog'
+import { ExportButton } from './components/export-button'
 import { Sale, saleListSchema } from './data/schema'
 import { call } from '@/services/api'
 import { toast } from '@/hooks/use-toast'
@@ -23,8 +24,6 @@ export default function Sales() {
         // Fetch all orders and filter for confirmed status only
         const allOrders = await call('get', 'orders')
         const confirmedOrders = allOrders.filter((order: any) => order.status === 'confirmed')
-        console.log('All orders:', allOrders)
-        console.log('Confirmed orders:', confirmedOrders)
         setSales(confirmedOrders)
       } catch (error) {
         if (error instanceof Error) {
@@ -43,7 +42,6 @@ export default function Sales() {
   }, [])
 
   const handleViewDetails = (sale: Sale) => {
-    console.log('handleViewDetails called with:', sale)
     setSelectedSale(sale)
     setDetailDialogOpen(true)
   }
@@ -85,6 +83,7 @@ export default function Sales() {
               View all confirmed orders and sales.
             </p>
           </div>
+          <ExportButton sales={saleList} disabled={loading} />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
           {loading ? (

@@ -12,6 +12,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { getDashboardStats, getOrdersReport, getYearlyReport } from './services'
 import { DashboardStats, OrdersReport, YearlyReport } from './types'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ChartExportButton } from './components/chart-export-button'
 import {
   LineChart,
   Line,
@@ -222,21 +223,29 @@ export default function Dashboard() {
 
               {/* Yearly Orders Bar Chart */}
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle>Yearly Orders Comparison</CardTitle>
+                  <ChartExportButton 
+                    chartElementId="yearly-orders-chart"
+                    chartTitle="Yearly Orders Comparison"
+                    data={{ yearlyReport }}
+                    disabled={yearlyLoading}
+                    title="Export Chart"
+                  />
                 </CardHeader>
                 <CardContent>
                   {yearlyLoading ? (
                     <Skeleton className='h-80 w-full' />
                   ) : yearlyReport ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart
-                        data={Object.entries(yearlyReport).map(([year, data]) => ({
-                          year,
-                          orders: data.orders,
-                        }))}
-                        margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
-                      >
+                    <div id="yearly-orders-chart">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart
+                          data={Object.entries(yearlyReport).map(([year, data]) => ({
+                            year,
+                            orders: data.orders,
+                          }))}
+                          margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
+                        >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="year" />
                         <YAxis 
@@ -247,29 +256,38 @@ export default function Dashboard() {
                           labelFormatter={(label) => `Year: ${label}`}
                         />
                         <Bar dataKey="orders" fill="#3b82f6" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   ) : null}
                 </CardContent>
               </Card>
 
               {/* Yearly Revenue Bar Chart */}
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle>Yearly Revenue Comparison</CardTitle>
+                  <ChartExportButton 
+                    chartElementId="yearly-revenue-chart"
+                    chartTitle="Yearly Revenue Comparison"
+                    data={{ yearlyReport }}
+                    disabled={yearlyLoading}
+                    title="Export Chart"
+                  />
                 </CardHeader>
                 <CardContent>
                   {yearlyLoading ? (
                     <Skeleton className='h-80 w-full' />
                   ) : yearlyReport ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart
-                        data={Object.entries(yearlyReport).map(([year, data]) => ({
-                          year,
-                          revenue: data.revenue,
-                        }))}
-                        margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
-                      >
+                    <div id="yearly-revenue-chart">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart
+                          data={Object.entries(yearlyReport).map(([year, data]) => ({
+                            year,
+                            revenue: data.revenue,
+                          }))}
+                          margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
+                        >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="year" />
                         <YAxis 
@@ -288,28 +306,37 @@ export default function Dashboard() {
                           labelFormatter={(label) => `Year: ${label}`}
                         />
                         <Bar dataKey="revenue" fill="#10b981" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   ) : null}
                 </CardContent>
               </Card>
 
               {/* Monthly Orders Chart */}
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle>Monthly Orders Trend</CardTitle>
+                  <ChartExportButton 
+                    chartElementId="monthly-orders-trend-chart"
+                    chartTitle="Monthly Orders Trend"
+                    data={{ ordersReport }}
+                    disabled={ordersLoading}
+                    title="Export Chart"
+                  />
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                                         <LineChart data={Array.from({ length: 12 }, (_, i) => {
-                       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                       return {
-                         month: monthNames[i],
-                         2023: (ordersReport.monthlyOrders?.[2023]?.[i]) || 0,
-                         2024: (ordersReport.monthlyOrders?.[2024]?.[i]) || 0,
-                         2025: (ordersReport.monthlyOrders?.[2025]?.[i]) || 0,
-                       }
-                     })}>
+                  <div id="monthly-orders-trend-chart">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={Array.from({ length: 12 }, (_, i) => {
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                        return {
+                          month: monthNames[i],
+                          2023: (ordersReport.monthlyOrders?.[2023]?.[i]) || 0,
+                          2024: (ordersReport.monthlyOrders?.[2024]?.[i]) || 0,
+                          2025: (ordersReport.monthlyOrders?.[2025]?.[i]) || 0,
+                        }
+                      })}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />
@@ -318,8 +345,9 @@ export default function Dashboard() {
                       <Line type="monotone" dataKey="2023" stroke="#3b82f6" strokeWidth={2} />
                       <Line type="monotone" dataKey="2024" stroke="#10b981" strokeWidth={2} />
                       <Line type="monotone" dataKey="2025" stroke="#f59e0b" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -327,87 +355,113 @@ export default function Dashboard() {
               {/* <div className="grid gap-6 md:grid-cols-2"> */}
                 {/* Order Status Distribution */}
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle>Order Status Distribution</CardTitle>
+                    <ChartExportButton 
+                      chartElementId="order-status-distribution-chart"
+                      chartTitle="Order Status Distribution"
+                      data={{ ordersReport }}
+                      disabled={ordersLoading}
+                      title="Export Chart"
+                    />
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={Object.entries(ordersReport.orderStatusDistribution || {}).map(([status, count]) => ({
-                            name: status.charAt(0).toUpperCase() + status.slice(1),
-                            value: count,
-                          }))}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {Object.entries(ordersReport.orderStatusDistribution || {}).map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444'][index % 5]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    <div id="order-status-distribution-chart">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={Object.entries(ordersReport.orderStatusDistribution || {}).map(([status, count]) => ({
+                              name: status.charAt(0).toUpperCase() + status.slice(1),
+                              value: count,
+                            }))}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {Object.entries(ordersReport.orderStatusDistribution || {}).map((_, index) => (
+                              <Cell key={`cell-${index}`} fill={['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444'][index % 5]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   </CardContent>
                 </Card>
 
                 {/* Confirmed vs Cancelled Distribution */}
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle>Confirmed vs Cancelled Distribution</CardTitle>
+                    <ChartExportButton 
+                      chartElementId="confirmed-cancelled-distribution-chart"
+                      chartTitle="Confirmed vs Cancelled Distribution"
+                      data={{ ordersReport }}
+                      disabled={ordersLoading}
+                      title="Export Chart"
+                    />
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={Object.entries(ordersReport.confirmedCancelledDistribution || {}).map(([status, count]) => ({
-                            name: status.charAt(0).toUpperCase() + status.slice(1),
-                            value: count,
-                          }))}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {Object.entries(ordersReport.confirmedCancelledDistribution || {}).map(([status, _], index) => {
-                            // Use different colors for confirmed vs cancelled
-                            const color = status.toLowerCase().includes('confirmed') ? '#10b981' : '#ef4444'
-                            return <Cell key={`cell-${index}`} fill={color} />
-                          })}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    <div id="confirmed-cancelled-distribution-chart">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={Object.entries(ordersReport.confirmedCancelledDistribution || {}).map(([status, count]) => ({
+                              name: status.charAt(0).toUpperCase() + status.slice(1),
+                              value: count,
+                            }))}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {Object.entries(ordersReport.confirmedCancelledDistribution || {}).map(([status, _], index) => {
+                              // Use different colors for confirmed vs cancelled
+                              const color = status.toLowerCase().includes('confirmed') ? '#10b981' : '#ef4444'
+                              return <Cell key={`cell-${index}`} fill={color} />
+                            })}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   </CardContent>
                 </Card>
 
                 {/* Monthly Revenue by Year */}
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle>Monthly Revenue by Year</CardTitle>
+                    <ChartExportButton 
+                      chartElementId="monthly-revenue-by-year-chart"
+                      chartTitle="Monthly Revenue by Year"
+                      data={{ ordersReport }}
+                      disabled={ordersLoading}
+                      title="Export Chart"
+                    />
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart 
-                        data={Array.from({ length: 12 }, (_, i) => {
-                          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                          return {
-                            month: monthNames[i],
-                            2023: (ordersReport.monthlyRevenue?.[2023]?.[i]) || 0,
-                            2024: (ordersReport.monthlyRevenue?.[2024]?.[i]) || 0,
-                            2025: (ordersReport.monthlyRevenue?.[2025]?.[i]) || 0,
-                          }
-                        })}
-                        margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
-                      >
+                    <div id="monthly-revenue-by-year-chart">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart 
+                          data={Array.from({ length: 12 }, (_, i) => {
+                            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                            return {
+                              month: monthNames[i],
+                              2023: (ordersReport.monthlyRevenue?.[2023]?.[i]) || 0,
+                              2024: (ordersReport.monthlyRevenue?.[2024]?.[i]) || 0,
+                              2025: (ordersReport.monthlyRevenue?.[2025]?.[i]) || 0,
+                            }
+                          })}
+                          margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
+                        >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
                         <YAxis 
@@ -429,8 +483,9 @@ export default function Dashboard() {
                         <Bar dataKey="2023" fill="#3b82f6" />
                         <Bar dataKey="2024" fill="#10b981" />
                         <Bar dataKey="2025" fill="#f59e0b" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   </CardContent>
                 </Card>
               {/* </div> */}
